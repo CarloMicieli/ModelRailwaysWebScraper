@@ -1,4 +1,5 @@
 ﻿using AngleSharp.Html.Dom;
+using Flurl;
 using System;
 using System.Threading.Tasks;
 using WebScraper.Model;
@@ -65,5 +66,8 @@ namespace WebScraper.Scraping
         protected abstract IProductsCollection ExtractProducts(IHtmlDocument html);
 
         protected abstract ProductInfo ExtractProductInfo(IHtmlDocument html);
+
+        protected Uri CombineUrl(string path) =>
+            new Uri(Url.Combine(this.BaseUri.AbsoluteUri, path));
     }
 }

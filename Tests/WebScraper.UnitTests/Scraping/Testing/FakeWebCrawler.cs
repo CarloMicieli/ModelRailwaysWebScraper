@@ -8,10 +8,11 @@ namespace WebScraper.UnitTests.Scraping.Testing
     {
         private const string BaseDir = @"..\..\..\TestPages\";
 
-        public Task<string> FetchResource(string url)
+        public async Task<string> FetchResource(string url)
         {
-            using var streamReader = new StreamReader(BaseDir + url);
-            return streamReader.ReadToEndAsync();
+            string path = Path.Combine(BaseDir, url.Replace(@"http://localhost/", "").Replace(@"/", "\\"));
+            using var streamReader = new StreamReader(BaseDir + url.Replace(@"http://localhost/", ""));
+            return await streamReader.ReadToEndAsync();
         }
     }
 }
