@@ -53,6 +53,52 @@ namespace WebScraper.UnitTests.Wrappers
             });
         }
 
+        [Fact]
+        public async Task ModellbahnshopLippe_ExtractProductInfo_ShouldExtractDescription()
+        {
+            var productInfo = await RunProductInfoExtraction();
+
+            productInfo.Should().NotBeNull();
+            productInfo.Brand.Should().Be("A.C.M.E.");
+            productInfo.Description.Should().Be("60472 Gauge H0  E.633.001 locomotive of FS, Epoche IV");
+        }
+
+        [Fact]
+        public async Task ModellbahnshopLippe_ExtractProductInfo_ShouldExtractFeatures()
+        {
+            var productInfo = await RunProductInfoExtraction();
+
+            productInfo.Should().NotBeNull();
+            productInfo.Features.Should().HaveCount(7);
+            productInfo.Features.Should().Contain(new Feature
+            {
+                Icon = "/images/icons_spuren/icon_9.gif",
+                Label="H0 1:87"
+            });
+        }
+
+        [Fact]
+        public async Task ModellbahnshopLippe_ExtractProductInfo_ShouldExtractCategories()
+        {
+            var productInfo = await RunProductInfoExtraction();
+
+            productInfo.Should().NotBeNull();
+            productInfo.Categories.Should().HaveCount(3);
+            productInfo.Categories.Should().Contain("A.C.M.E.");
+            productInfo.Categories.Should().Contain("H0");
+            productInfo.Categories.Should().Contain("Electric Locomotive");
+        }
+
+
+        [Fact]
+        public async Task ModellbahnshopLippe_ExtractProductInfo_ShouldExtractSpecifications()
+        {
+            var productInfo = await RunProductInfoExtraction();
+
+            productInfo.Should().NotBeNull();
+            productInfo.Specifications.Should().HaveCount(14);
+        }
+
         private Task<ProductInfo> RunProductInfoExtraction()
         {
             var product = new Product

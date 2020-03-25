@@ -60,11 +60,76 @@ namespace WebScraper.Scraping.WebSites
                 .SelectMany(ExtractImages)
                 .ToImmutableList();
 
+            ImmutableHashSet<string> categories = null;
+            string brandName = null;
+            string description = null;
+            var header = html.QuerySelector("div.page-header");
+            if (header != null)
+            {
+                var el = header.Children
+                    .FirstOrDefault(it => it.LocalName == "h1");
+                
+                description = el.Children.FirstOrDefault(it => it.LocalName == "small")
+                    .TextContent;
+                brandName = el.TextContent.Replace(description, "").Trim();
+
+                var catEl = header.Children
+                    .FirstOrDefault(it => it.LocalName == "span" && it.ClassName == "textdeco");
+
+                categories = catEl.Children
+                    .Select(it => it.TextContent.Trim())
+                    .ToImmutableHashSet();
+            }
+
+            var features = ImmutableList.Create<Feature>();
+            var featuresBox = html.QuerySelector("div.padModInh");
+            if (featuresBox != null)
+            {
+                features = featuresBox.Children
+                    .Select(div => div.FirstElementChild)
+                    .Select(img => new Feature
+                    {
+                        Label = img.GetAttribute("alt"),
+                        Icon = img.GetAttribute("src")
+                    })
+                    .ToImmutableList();
+            }
+
+            var specificationsBox = html.QuerySelector("h4.panel-title")
+                    .ParentElement
+                    .ParentElement;
+
+            var children = specificationsBox.Children
+                    .Where(it => it.ClassName == "panel-body")
+                    .SelectMany(it => it.Children)
+                    .ToList();
+
+            var longDescription = children.FirstOrDefault()?.TextContent;
+
+            var specifications = children.LastOrDefault().QuerySelectorAll("tr")
+                .Select(row =>
+                {
+                    var cols = row.Children.Select(c => c.TextContent).ToList();
+                    return new
+                    {
+                        Label = cols.FirstOrDefault(),
+                        Value = cols.LastOrDefault()
+                    };
+                })
+                .Where(it => string.IsNullOrWhiteSpace(it.Label) == false)
+                .ToImmutableDictionary(it => it.Label, it => it.Value);
+
             return new ProductInfo
             {
                 Title = title,
                 Metadata = metadata,
-                Images = images
+                Images = images,
+                Brand = brandName,
+                Description = description,
+                LongDescription = longDescription,
+                Features = features,
+                Specifications = specifications,
+                Categories = categories
             };
             #endregion
         }
