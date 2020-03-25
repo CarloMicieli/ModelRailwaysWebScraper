@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WebScraper.UnitTests.Scraping.Testing
+namespace WebScraper.UnitTests.TestHelpers
 {
     public static class TestPages
     {

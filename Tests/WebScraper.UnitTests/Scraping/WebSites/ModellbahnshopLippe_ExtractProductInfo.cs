@@ -1,19 +1,19 @@
-﻿using Xunit;
-using FluentAssertions;
-using WebScraper.Scraping.WebSites;
-using WebScraper.UnitTests.Scraping.Testing;
-using WebScraper.Resources;
+﻿using FluentAssertions;
 using System;
 using System.Threading.Tasks;
 using WebScraper.Model;
+using WebScraper.Resources;
+using WebScraper.UnitTests.TestHelpers;
+using WebScraper.UnitTests.TestHelpers.Crawlers;
+using Xunit;
 
-namespace WebScraper.UnitTests.Wrappers
+namespace WebScraper.Scraping.WebSites
 {
-    public class ModellbahnshopLippeTests
+    public class ModellbahnshopLippe_ExtractProductInfo
     {
         private readonly ModellbahnshopLippe _wrapper;
 
-        public ModellbahnshopLippeTests()
+        public ModellbahnshopLippe_ExtractProductInfo()
         {
             var crawler = new FakeWebCrawler();
             _wrapper = new ModellbahnshopLippe(crawler);
@@ -73,7 +73,7 @@ namespace WebScraper.UnitTests.Wrappers
             productInfo.Features.Should().Contain(new Feature
             {
                 Icon = "/images/icons_spuren/icon_9.gif",
-                Label="H0 1:87"
+                Label = "H0 1:87"
             });
         }
 
@@ -88,7 +88,6 @@ namespace WebScraper.UnitTests.Wrappers
             productInfo.Categories.Should().Contain("H0");
             productInfo.Categories.Should().Contain("Electric Locomotive");
         }
-
 
         [Fact]
         public async Task ModellbahnshopLippe_ExtractProductInfo_ShouldExtractSpecifications()

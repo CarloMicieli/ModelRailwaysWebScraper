@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using WebScraper.Scraping;
 
-namespace WebScraper.UnitTests.Scraping.Testing
+namespace WebScraper.UnitTests.TestHelpers.Crawlers
 {
     public sealed class FakeWebCrawler : IWebCrawler
     {
