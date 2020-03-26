@@ -33,7 +33,7 @@ namespace ModelRailwayWorker
                 {
                     var startUp = new Startup(hostContext.Configuration);
                     startUp.ConfigureServices(services);
-                    
+
                     services.AddHostedService<Worker>();
                 });
     }

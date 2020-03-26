@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MassTransit;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -11,11 +12,13 @@ namespace ModelRailwayWorker
     {
         private readonly ILogger<Worker> _logger;
         private readonly IBusControl _bus;
+        private readonly IServiceScopeFactory _services;
 
-        public Worker(IBusControl bus, ILogger<Worker> logger)
+        public Worker(IServiceScopeFactory services, IBusControl bus, ILogger<Worker> logger)
         {
             _logger = logger;
             _bus = bus;
+            _services = services;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -31,6 +34,14 @@ namespace ModelRailwayWorker
         {
             _logger.LogInformation("Starting bus");
             await _bus.StartAsync(cancellationToken).ConfigureAwait(false);
+
+            // To overcome lifetime differences between the Worker (singleton)
+            // and mass-transing request clients (scoped)
+            using (var scope = _services.CreateScope())
+            {
+                var client = scope.ServiceProvider.GetRequiredService<Client>();
+                await client.Run();
+            }
         }
 
         public override Task StopAsync(CancellationToken cancellationToken)

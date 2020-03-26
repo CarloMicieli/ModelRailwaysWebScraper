@@ -65,7 +65,7 @@ namespace WebScraper.Scraping
             return ExtractProductInfo(html);
         }
 
-        protected Task<IHtmlDocument> FetchDocument(WebResource resource) => 
+        protected Task<IHtmlDocument> FetchDocument(WebResource resource) =>
             FetchDocument(resource.ResourceUri.AbsoluteUri);
 
         protected async Task<IHtmlDocument> FetchDocument(string url)

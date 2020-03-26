@@ -12,14 +12,14 @@ namespace WebScraper.Scraping.WebSites
 {
     public sealed class ModellbahnshopLippe : AbstractWrapper
     {
-        public ModellbahnshopLippe(IWebCrawler webCrawler) 
-            : this(webCrawler, 
+        public ModellbahnshopLippe(IWebCrawler webCrawler)
+            : this(webCrawler,
                    new Uri(@"https://www.modellbahnshop-lippe.com/Manufacturer/Products/gb/hersteller.html"))
         {
         }
 
         public ModellbahnshopLippe(IWebCrawler webCrawler, Uri startPage)
-            : base(SystemClock.Instance, 
+            : base(SystemClock.Instance,
                     webCrawler,
                     new Uri(@"https://www.modellbahnshop-lippe.com"),
                     startPage)
@@ -124,7 +124,7 @@ namespace WebScraper.Scraping.WebSites
 
             var productsDiv = html.QuerySelector("div#dProduktContent");
             var productsPanel = productsDiv.QuerySelector("div.panel-body");
-            
+
             var products = productsPanel.QuerySelectorAll("div.padProdTab");
             var productsList = products.Select(p =>
                 {
@@ -176,7 +176,7 @@ namespace WebScraper.Scraping.WebSites
             {
                 var el = header.Children
                     .FirstOrDefault(it => it.LocalName == "h1");
-                
+
                 description = el.Children.FirstOrDefault(it => it.LocalName == "small")
                     .TextContent;
                 brandName = el.TextContent.Replace(description, "").Trim();

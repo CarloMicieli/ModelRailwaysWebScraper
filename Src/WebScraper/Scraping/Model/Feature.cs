@@ -21,7 +21,7 @@ namespace WebScraper.Scraping.Model
 
         public bool Equals(Feature other) => AreEquals(this, other);
 
-        private static bool AreEquals(Feature left, Feature right) => 
+        private static bool AreEquals(Feature left, Feature right) =>
             left.Icon == right.Icon && left.Label == right.Label;
     }
 }

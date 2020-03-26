@@ -8,8 +8,8 @@ namespace WebScraper.Scraping.Results
     public sealed class CategoriesResult : IEquatable<CategoriesResult>
     {
         public CategoriesResult(
-            Manufacturer resource, 
-            Instant timestamp, 
+            Manufacturer resource,
+            Instant timestamp,
             ImmutableList<Category> categories)
         {
             Resource = resource;

@@ -2,6 +2,9 @@ using System;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ModelRailwayWorker.Consumers;
+using ModelRailwayWorker.Contracts;
+using ModelRailwayWorker.Configuration;
 using Serilog;
 
 namespace ModelRailwayWorker
@@ -21,18 +24,30 @@ namespace ModelRailwayWorker
                 .ReadFrom.Configuration(Configuration)
                 .CreateLogger();
 
+            var rabbitMq = new RabbitMqConfig();
+            Configuration.GetSection("RabbitMq").Bind(rabbitMq);
+
             IBusControl CreateBus(IServiceProvider serviceProvider)
             {
                 return Bus.Factory.CreateUsingRabbitMq(cfg =>
                 {
-                    cfg.Host("rabbitmq://localhost");
+                    cfg.Host(rabbitMq.Host, rmq =>
+                    {
+                        rmq.Username(rabbitMq.Username);
+                        rmq.Password(rabbitMq.Password);
+                    });
+                    cfg.PurgeOnStartup = true;
                 });
-            }                
+            }
 
             services.AddMassTransit(cfg =>
             {
                 cfg.AddBus(CreateBus);
+                cfg.AddConsumersFromNamespaceContaining(typeof(HelloWorldConsumer));
+                cfg.AddRequestClient<HelloWorld>();
             });
+
+            services.AddScoped<Client>();
         }
     }
 }

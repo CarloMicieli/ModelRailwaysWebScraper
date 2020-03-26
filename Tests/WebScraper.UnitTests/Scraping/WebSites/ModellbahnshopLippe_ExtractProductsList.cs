@@ -46,7 +46,7 @@ namespace WebScraper.Scraping.WebSites
                 ResourceUri = TestPages.ModellbahnshopLippe.ProductsList,
                 CategoryName = "Electric locomotive",
                 Brand = "A.C.M.E.",
-                Scale = "H0"                
+                Scale = "H0"
             };
             return _wrapper.GetProducts(category);
         }
@@ -54,7 +54,7 @@ namespace WebScraper.Scraping.WebSites
 
     public static class ProductsResultExtensions
     {
-        public static void ShouldHaveCurrentPage(this ProductsResult pr) => 
+        public static void ShouldHaveCurrentPage(this ProductsResult pr) =>
             pr.Pagination.CurrentPage.Should().NotBeNull();
         public static void ShouldHavePreviousPage(this ProductsResult pr) =>
             pr.Pagination.PreviousPage.Should().NotBeNull();
