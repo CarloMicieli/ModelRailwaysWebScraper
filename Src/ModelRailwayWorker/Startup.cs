@@ -37,6 +37,11 @@ namespace ModelRailwayWorker
                         rmq.Password(rabbitMq.Password);
                     });
                     cfg.PurgeOnStartup = true;
+
+                    cfg.ReceiveEndpoint("hello_queue", ep => 
+                    {
+                        ep.Consumer<HelloWorldConsumer>();
+                    });
                 });
             }
 
