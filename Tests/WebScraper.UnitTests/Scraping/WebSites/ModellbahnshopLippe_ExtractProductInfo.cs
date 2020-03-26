@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
 using System;
 using System.Threading.Tasks;
-using WebScraper.Model;
 using WebScraper.Resources;
+using WebScraper.Scraping.Model;
 using WebScraper.UnitTests.TestHelpers;
 using WebScraper.UnitTests.TestHelpers.Crawlers;
 using Xunit;

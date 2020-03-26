@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WebScraper.Model
+namespace WebScraper.Scraping.Model
 {
     public sealed class Feature : IEquatable<Feature>
     {

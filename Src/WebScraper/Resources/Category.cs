@@ -1,4 +1,6 @@
-﻿namespace WebScraper.Resources
+﻿using System;
+
+namespace WebScraper.Resources
 {
     public sealed class Category : WebResource
     {
@@ -6,5 +8,6 @@
         public string Scale { set; get; }
         public string CategoryName { set; get; }
         public string PowerMethod { set; get; }
+        public int PageNumber { set; get; } = 1;
     }
 }

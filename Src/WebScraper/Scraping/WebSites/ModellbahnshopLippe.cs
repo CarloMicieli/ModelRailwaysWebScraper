@@ -1,42 +1,150 @@
 ﻿using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using Flurl;
+using NodaTime;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using WebScraper.Model;
-using WebScraper.Resources.Collections;
+using WebScraper.Resources;
+using WebScraper.Scraping.Model;
 
 namespace WebScraper.Scraping.WebSites
 {
     public sealed class ModellbahnshopLippe : AbstractWrapper
     {
         public ModellbahnshopLippe(IWebCrawler webCrawler) 
-            : base(webCrawler, 
-                  new Uri(@"https://www.modellbahnshop-lippe.com"),
-                  new Uri(@"https://www.modellbahnshop-lippe.com/Manufacturer/Products/gb/hersteller.html"))
+            : this(webCrawler, 
+                   new Uri(@"https://www.modellbahnshop-lippe.com/Manufacturer/Products/gb/hersteller.html"))
         {
         }
 
-        protected override IManufacturersCollection ExtractManufacturers(IHtmlDocument html)
+        public ModellbahnshopLippe(IWebCrawler webCrawler, Uri startPage)
+            : base(SystemClock.Instance, 
+                    webCrawler,
+                    new Uri(@"https://www.modellbahnshop-lippe.com"),
+                    startPage)
+        {
+        }
+
+        protected override ImmutableList<Manufacturer> ExtractManufacturers(IHtmlDocument html)
         {
             #region [ Extract Manufacturers ]
-            throw new System.NotImplementedException();
+
+            var listElement = html.QuerySelector("div#HERST_LISTE");
+
+            ImmutableList<Manufacturer> res = listElement.Children
+                .Select(it => it.QuerySelector("table.wHerstUeb"))
+                .Select(table => table.QuerySelector("td").FirstElementChild)
+                .Select(it => new Manufacturer
+                {
+                    ResourceUri = CombineUrl(it.GetAttribute("href")),
+                    Name = it.TextContent
+                })
+                .ToImmutableList();
+
+            return res;
+
             #endregion
         }
 
-        protected override ICategoriesCollection ExtractCategories(IHtmlDocument html)
+        protected override ImmutableList<Category> ExtractCategories(IHtmlDocument html)
         {
             #region [ Extract Categories ]
-            throw new System.NotImplementedException();
+
+            var element = html.QuerySelectorAll("div.container")
+                .Skip(3)
+                .FirstOrDefault();
+
+            var scaleDivs = element.Children
+                .Where(it => it.LocalName == "div" && it.ClassName == "row");
+
+            IEnumerable<Category> categories = new List<Category>();
+            foreach (var scaleDiv in scaleDivs)
+            {
+                var headerDiv = scaleDiv.QuerySelector("div.panel-primary");
+                string scaleSlug = headerDiv.Children
+                    .Where(it => it.LocalName == "a" && it.GetAttribute("rel") == "nofollow")
+                    .First()
+                    .GetAttribute("name");
+                string scaleName = headerDiv.QuerySelector("div.panel-heading").TextContent;
+
+                var left = scaleDiv.QuerySelector("div.paddAdrRg");
+                if (left != null)
+                {
+                    var categories1 = left.QuerySelectorAll("a.aHlist")
+                      .Select(it => new Category
+                      {
+                          CategoryName = it.TextContent,
+                          PowerMethod = null,
+                          ResourceUri = CombineUrl(it.GetAttribute("href")),
+                          Scale = scaleName
+                      });
+                    categories = categories.Concat(categories1);
+                }
+
+                var right = scaleDiv.QuerySelector("div.paddAdrLf");
+                if (right != null)
+                {
+                    var categories2 = right.QuerySelectorAll("a.aHlist")
+                      .Select(it => new Category
+                      {
+                          CategoryName = it.TextContent,
+                          PowerMethod = null,
+                          ResourceUri = CombineUrl(it.GetAttribute("href")),
+                          Scale = scaleName
+                      });
+                    categories = categories.Concat(categories2);
+                }
+            }
+
+            return categories.ToImmutableList();
             #endregion
         }
 
-        protected override IProductsCollection ExtractProducts(IHtmlDocument html)
+        protected override (ImmutableList<Product>, ImmutableList<Page>) ExtractProducts(IHtmlDocument html)
         {
             #region [ Extract Products ]
-            throw new System.NotImplementedException();
+
+            ImmutableList<Page> pages;
+            var paginationEl = html.QuerySelector("ul.pagination");
+            if (paginationEl != null)
+            {
+                pages = paginationEl.Children
+                    .Where(it => it.LocalName == "li")
+                    .Select(li => (IsActive: li.ClassName == "active", Link: li.FirstElementChild))
+                    .Select(it => PageFromLinkElement(it.Link, it.IsActive))
+                    .Where(it => it.IsValid)
+                    .Select(it => it.Page)
+                    .ToImmutableList();
+            }
+            else
+            {
+                pages = ImmutableList.Create<Page>();
+            }
+
+            var productsDiv = html.QuerySelector("div#dProduktContent");
+            var productsPanel = productsDiv.QuerySelector("div.panel-body");
+            
+            var products = productsPanel.QuerySelectorAll("div.padProdTab");
+            var productsList = products.Select(p =>
+                {
+                    var productLink = p.QuerySelector("a.grpModList").GetAttribute("href");
+                    var productDesc = p.QuerySelector("div.tdProdDesc").TextContent;
+                    var brand = p.QuerySelector("img.img_herst").GetAttribute("alt");
+                    var info = p.QuerySelector("div.dSpur").TextContent;
+
+                    return new Product
+                    {
+                        Brand = brand,
+                        Description = productDesc,
+                        ResourceUri = CombineUrl(productLink),
+                        Info = info
+                    };
+                })
+                .ToImmutableList();
+
+            return (productsList, pages);
+
             #endregion
         }
 
@@ -149,6 +257,14 @@ namespace WebScraper.Scraping.WebSites
                     ImageSrc = CombineUrl(img.GetAttribute("data-zoom-image"))
                 }
             };
+        }
+
+        private (bool IsValid, Page Page) PageFromLinkElement(IElement it, bool isActive)
+        {
+            string page = it.TextContent;
+            string link = it.GetAttribute("href");
+            bool isValid = Page.TryCreate(page, link, isActive, out var result);
+            return (isValid, result);
         }
     }
 }

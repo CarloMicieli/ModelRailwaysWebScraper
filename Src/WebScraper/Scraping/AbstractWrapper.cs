@@ -1,23 +1,27 @@
 ﻿using AngleSharp.Html.Dom;
 using Flurl;
+using NodaTime;
 using System;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
-using WebScraper.Model;
 using WebScraper.Resources;
-using WebScraper.Resources.Collections;
+using WebScraper.Scraping.Model;
+using WebScraper.Scraping.Results;
 
 namespace WebScraper.Scraping
 {
     public abstract class AbstractWrapper : IWrapper
     {
         private readonly IWebCrawler _webCrawler;
+        private readonly IClock _clock;
 
-        protected AbstractWrapper(IWebCrawler webCrawler, Uri baseUri, Uri startPage)
+        protected AbstractWrapper(IClock clock, IWebCrawler webCrawler, Uri baseUri, Uri startPage)
         {
             Parser = new HtmlParser();
             BaseUri = baseUri;
             StartPage = startPage;
-            
+
+            _clock = clock;
             _webCrawler = webCrawler ??
                 throw new ArgumentNullException(nameof(webCrawler));
         }
@@ -26,22 +30,33 @@ namespace WebScraper.Scraping
         public Uri StartPage { get; }
         public HtmlParser Parser { get; }
 
-        public async Task<IManufacturersCollection> GetManufacturers()
+        public async Task<ImmutableList<Manufacturer>> GetManufacturers()
         {
             IHtmlDocument html = await FetchDocument(StartPage.AbsoluteUri);
             return ExtractManufacturers(html);
         }
 
-        public async Task<ICategoriesCollection> GetCategories(Manufacturer manufacturer)
+        public async Task<CategoriesResult> GetCategories(Manufacturer manufacturer)
         {
             IHtmlDocument html = await FetchDocument(manufacturer);
-            return ExtractCategories(html);
+            var results = ExtractCategories(html);
+            return new CategoriesResult(
+                manufacturer,
+                _clock.GetCurrentInstant(),
+                results);
         }
 
-        public async Task<IProductsCollection> GetProducts(Category category)
+        public async Task<ProductsResult> GetProducts(Category category)
         {
             IHtmlDocument html = await FetchDocument(category);
-            return ExtractProducts(html);
+            var (products, pages) = ExtractProducts(html);
+
+            return new ProductsResult(
+                category,
+                _clock.GetCurrentInstant(),
+                Pagination.Of(pages, category.PageNumber),
+                products
+                );
         }
 
         public async Task<ProductInfo> ExtractProductInfo(Product product)
@@ -59,11 +74,11 @@ namespace WebScraper.Scraping
             return Parser.ParseDocument(content);
         }
 
-        protected abstract IManufacturersCollection ExtractManufacturers(IHtmlDocument html);
+        protected abstract ImmutableList<Manufacturer> ExtractManufacturers(IHtmlDocument html);
 
-        protected abstract ICategoriesCollection ExtractCategories(IHtmlDocument html);
+        protected abstract ImmutableList<Category> ExtractCategories(IHtmlDocument html);
 
-        protected abstract IProductsCollection ExtractProducts(IHtmlDocument html);
+        protected abstract (ImmutableList<Product>, ImmutableList<Page>) ExtractProducts(IHtmlDocument html);
 
         protected abstract ProductInfo ExtractProductInfo(IHtmlDocument html);
 
