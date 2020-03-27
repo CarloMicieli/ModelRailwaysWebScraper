@@ -1,4 +1,4 @@
-# ModelRailwaysWebScraper
+# ModelRailways Web Scraper
 
 Just another web scraper for model railways info.
 
