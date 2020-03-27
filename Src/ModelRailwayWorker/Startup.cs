@@ -7,6 +7,7 @@ using ModelRailwayWorker.Contracts;
 using ModelRailwayWorker.Configuration;
 using Serilog;
 using MongoDB;
+using WebScraper;
 
 namespace ModelRailwayWorker
 {
@@ -25,10 +26,15 @@ namespace ModelRailwayWorker
                 .ReadFrom.Configuration(Configuration)
                 .CreateLogger();
 
-            services.UseMongoDB(cfg =>
+            services.AddMongoDB(cfg =>
             {
                 cfg.UseConnectionString(Configuration["MongoUri"]);
                 cfg.UseDatabaseName("ModelRailwaysDb");
+            });
+
+            services.AddWebScrapers(b =>
+            {
+                b.ModellbahnshopLippe = true;
             });
 
             var rabbitMq = new RabbitMqConfig();

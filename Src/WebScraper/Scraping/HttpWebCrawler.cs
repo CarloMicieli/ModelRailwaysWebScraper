@@ -5,7 +5,10 @@ namespace WebScraper.Scraping
 {
     public sealed class HttpWebCrawler : IWebCrawler
     {
-        private static readonly HttpClient _http = new HttpClient();
+        private readonly HttpClient _http;
+
+        public HttpWebCrawler(IHttpClientFactory httpClientFactory) =>
+            _http = httpClientFactory.CreateClient();
 
         public Task<string> FetchResource(string url)
         {

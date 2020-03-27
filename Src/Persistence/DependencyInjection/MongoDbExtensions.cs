@@ -7,7 +7,7 @@ namespace MongoDB
 {
     public static class MongoDbExtensions
     {
-        public static IServiceCollection UseMongoDB(this IServiceCollection services, Action<MongoDbBuilder> buildAction)
+        public static IServiceCollection AddMongoDB(this IServiceCollection services, Action<MongoDbBuilder> buildAction)
         {
             var b = new MongoDbBuilder();
             buildAction(b);
@@ -16,7 +16,7 @@ namespace MongoDB
 
             services.AddSingleton<MongoClient>(client);
             services.AddSingleton<IMongoDatabase>(client.GetDatabase(b.DatabaseName));
-            services.AddSingleton(typeof(IMongoRepository<>), typeof(MongoRepository<>));
+            services.AddTransient(typeof(IMongoRepository<>), typeof(MongoRepository<>));
             return services;
         }
     }
