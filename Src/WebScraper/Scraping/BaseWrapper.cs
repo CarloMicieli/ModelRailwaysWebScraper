@@ -10,16 +10,15 @@ using WebScraper.Scraping.Results;
 
 namespace WebScraper.Scraping
 {
-    public abstract class AbstractWrapper : IWrapper
+    public abstract class BaseWrapper : IWrapper
     {
         private readonly IWebCrawler _webCrawler;
         private readonly IClock _clock;
 
-        protected AbstractWrapper(IClock clock, IWebCrawler webCrawler, Uri baseUri, Uri startPage)
+        protected BaseWrapper(IClock clock, IWebCrawler webCrawler, Uri baseUri)
         {
             Parser = new HtmlParser();
             BaseUri = baseUri;
-            StartPage = startPage;
 
             _clock = clock;
             _webCrawler = webCrawler ??
@@ -27,24 +26,11 @@ namespace WebScraper.Scraping
         }
 
         public Uri BaseUri { get; }
-        public Uri StartPage { get; }
         public HtmlParser Parser { get; }
 
-        public async Task<ImmutableList<Manufacturer>> GetManufacturers()
-        {
-            IHtmlDocument html = await FetchDocument(StartPage.AbsoluteUri);
-            return ExtractManufacturers(html);
-        }
+        public abstract Task<ImmutableList<Manufacturer>> GetManufacturers();
 
-        public async Task<CategoriesResult> GetCategories(Manufacturer manufacturer)
-        {
-            IHtmlDocument html = await FetchDocument(manufacturer);
-            var results = ExtractCategories(html);
-            return new CategoriesResult(
-                manufacturer,
-                _clock.GetCurrentInstant(),
-                results);
-        }
+        public abstract Task<CategoriesResult> GetCategories(Manufacturer manufacturer);
 
         public async Task<ProductsResult> GetProducts(Category category)
         {
@@ -74,15 +60,13 @@ namespace WebScraper.Scraping
             return Parser.ParseDocument(content);
         }
 
-        protected abstract ImmutableList<Manufacturer> ExtractManufacturers(IHtmlDocument html);
-
-        protected abstract ImmutableList<Category> ExtractCategories(IHtmlDocument html);
-
         protected abstract (ImmutableList<Product>, ImmutableList<Page>) ExtractProducts(IHtmlDocument html);
 
         protected abstract ProductInfo ExtractProductInfo(IHtmlDocument html);
 
         protected Uri CombineUrl(string path) =>
             new Uri(Url.Combine(this.BaseUri.AbsoluteUri, path));
+
+        protected Instant GetCurrentInstant() => _clock.GetCurrentInstant();
     }
 }

@@ -10,7 +10,7 @@ using WebScraper.Scraping.Model;
 
 namespace WebScraper.Scraping.WebSites
 {
-    public sealed class ModellbahnshopLippe : AbstractWrapper
+    public sealed class ModellbahnshopLippe : WrapperWithStartPage
     {
         public ModellbahnshopLippe(IWebCrawler webCrawler)
             : this(webCrawler,
