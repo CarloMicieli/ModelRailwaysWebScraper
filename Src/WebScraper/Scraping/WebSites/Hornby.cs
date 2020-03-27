@@ -11,10 +11,10 @@ namespace WebScraper.Scraping.WebSites
 {
     public sealed class Hornby : BaseWrapper
     {
-        public Hornby(IClock clock, IWebCrawler webCrawler) 
+        public Hornby(IClock clock, IWebCrawler webCrawler)
             : base(
-                clock, 
-                webCrawler, 
+                clock,
+                webCrawler,
                 new Uri("https://www.hornby.com"))
         {
         }

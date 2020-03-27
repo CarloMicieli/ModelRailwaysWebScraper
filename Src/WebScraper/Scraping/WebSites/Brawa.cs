@@ -11,10 +11,10 @@ namespace WebScraper.Scraping.WebSites
 {
     public sealed class Brawa : BaseWrapper
     {
-        public Brawa(IClock clock, IWebCrawler webCrawler) 
+        public Brawa(IClock clock, IWebCrawler webCrawler)
             : base(
-                clock, 
-                webCrawler, 
+                clock,
+                webCrawler,
                 new Uri("https://www.brawa.de"))
         {
         }

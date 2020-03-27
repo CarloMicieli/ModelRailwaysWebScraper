@@ -15,7 +15,7 @@ namespace WebScraper
 
             services.AddHttpClient();
             services.AddSingleton<IClock>(SystemClock.Instance);
-            
+
             services.AddTransient<IWebCrawler, HttpWebCrawler>();
 
             services.AddTransient<ModellbahnshopLippe>();
