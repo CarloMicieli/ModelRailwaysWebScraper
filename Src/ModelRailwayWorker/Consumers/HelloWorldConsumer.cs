@@ -7,7 +7,7 @@ namespace ModelRailwayWorker.Consumers
 {
     public class HelloWorldConsumer : IConsumer<HelloWorld>
     {
-       // private readonly ILogger<HelloWorldConsumer> _logger;
+        // private readonly ILogger<HelloWorldConsumer> _logger;
 
         /*public HelloWorldConsumer(ILogger<HelloWorldConsumer> logger)
         {
@@ -16,7 +16,7 @@ namespace ModelRailwayWorker.Consumers
 
         public async Task Consume(ConsumeContext<HelloWorld> context)
         {
-           // _logger.LogInformation($"Hello, {context.Message.Name}");
+            // _logger.LogInformation($"Hello, {context.Message.Name}");
             await context.RespondAsync<Greeting>(new { Greeting = $"Hello, {context.Message.Name}" });
         }
     }

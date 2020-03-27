@@ -7,19 +7,18 @@ namespace ModelRailwayWorker
 {
     public class Client
     {
-        private readonly IRequestClient<HelloWorld> _client;
+        private readonly ISendEndpointProvider _sendEndpoint;
         private readonly ILogger<Client> _logger;
 
-        public Client(IRequestClient<HelloWorld> client, ILogger<Client> logger)
+        public Client(ISendEndpointProvider sendEndpoint, ILogger<Client> logger)
         {
-            _client = client;
+            _sendEndpoint = sendEndpoint;
             _logger = logger;
         }
 
         public async Task Run()
         {
-            var response = await _client.GetResponse<string>(new { Name = "Ciccins" });
-            _logger.LogInformation(response.Message);
+            await _sendEndpoint.Send<HelloWorld>(new { Name = "Ciccins " });
         }
     }
 }

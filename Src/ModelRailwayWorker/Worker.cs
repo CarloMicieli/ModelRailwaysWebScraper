@@ -36,21 +36,18 @@ namespace ModelRailwayWorker
             _logger.LogInformation("Starting bus");
             await _bus.StartAsync(cancellationToken).ConfigureAwait(false);
 
-            for (int i = 0; i < 50; i++)
-            {
-                await Task.Delay(5000);
-                await _bus.Publish<HelloWorld>(new { Name = "Ciccins" });
-            }
-
-
-
             // To overcome lifetime differences between the Worker (singleton)
             // and mass-transing request clients (scoped)
-            //using (var scope = _services.CreateScope())
-            //{
-            //    var client = scope.ServiceProvider.GetRequiredService<Client>();
-            //    await client.Run();
-            //}
+            using (var scope = _services.CreateScope())
+            {
+                var client = scope.ServiceProvider.GetRequiredService<Client>();
+
+                for (int i = 0; i < 10000; i++)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    await client.Run();
+                }
+            }
         }
 
         public override Task StopAsync(CancellationToken cancellationToken)

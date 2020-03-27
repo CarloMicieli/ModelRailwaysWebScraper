@@ -29,16 +29,18 @@ namespace ModelRailwayWorker
 
             IBusControl CreateBus(IServiceProvider serviceProvider)
             {
-                return Bus.Factory.CreateUsingRabbitMq(cfg =>
+                return Bus.Factory.CreateUsingRabbitMq(sbc =>
                 {
-                    cfg.Host(rabbitMq.Host, rmq =>
+                    sbc.Host(rabbitMq.Host, rmq =>
                     {
                         rmq.Username(rabbitMq.Username);
                         rmq.Password(rabbitMq.Password);
                     });
-                    cfg.PurgeOnStartup = true;
+                    sbc.PurgeOnStartup = true;
 
-                    cfg.ReceiveEndpoint("hello_queue", ep => 
+                    EndpointConvention.Map<HelloWorld>(new Uri("queue:hello_queue"));
+
+                    sbc.ReceiveEndpoint("hello_queue", ep =>
                     {
                         ep.Consumer<HelloWorldConsumer>();
                     });
@@ -49,7 +51,6 @@ namespace ModelRailwayWorker
             {
                 cfg.AddBus(CreateBus);
                 cfg.AddConsumersFromNamespaceContaining(typeof(HelloWorldConsumer));
-                cfg.AddRequestClient<HelloWorld>();
             });
 
             services.AddScoped<Client>();
