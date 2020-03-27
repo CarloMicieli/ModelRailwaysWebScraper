@@ -18,5 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WebScraper\WebScraper.csproj" />
+    <ProjectReference Include="..\Persistence\Persistence.csproj" />
   </ItemGroup>
 </Project>

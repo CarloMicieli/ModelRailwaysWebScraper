@@ -6,6 +6,7 @@ using ModelRailwayWorker.Consumers;
 using ModelRailwayWorker.Contracts;
 using ModelRailwayWorker.Configuration;
 using Serilog;
+using MongoDB;
 
 namespace ModelRailwayWorker
 {
@@ -23,6 +24,12 @@ namespace ModelRailwayWorker
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(Configuration)
                 .CreateLogger();
+
+            services.UseMongoDB(cfg =>
+            {
+                cfg.UseConnectionString(Configuration["MongoUri"]);
+                cfg.UseDatabaseName("ModelRailwaysDb");
+            });
 
             var rabbitMq = new RabbitMqConfig();
             Configuration.GetSection("RabbitMq").Bind(rabbitMq);
