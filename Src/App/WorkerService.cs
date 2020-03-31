@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using App.Messages;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Rebus.Bus;
@@ -28,9 +27,9 @@ namespace App
         {
             _logger.LogInformation("Starting...");
 
-            await _bus.Send(new Job 
+            await _bus.Send(new WebScraper.Messages.ScrapeWebSiteCommand 
             { 
-                Name = "Hello"
+                WebsiteUrl = "http://localhost"
             });
         }
 

@@ -11,6 +11,9 @@ using Rebus.ServiceProvider;
 using Rebus.Config;
 using Rebus.Transport.InMem;
 using Rebus.Routing.TypeBased;
+using Persistence.Messages;
+using WebScraper.Messages;
+using Rebus.Persistence.InMem;
 
 namespace App
 {
@@ -56,8 +59,15 @@ namespace App
                     o.SetMaxParallelism(16);
                 })
                 .Logging(l => l.Serilog())
-                .Transport(t => t.UseInMemoryTransport(new InMemNetwork(), "Messages"))
-                .Routing(r => r.TypeBased().MapAssemblyOf<Startup>("Messages")));
+                .Transport(t => 
+                {
+                    t.UseInMemoryTransport(new InMemNetwork(), "scraper-messages");
+                })
+                .Subscriptions(s => s.StoreInMemory())
+                .Routing(r => 
+                    r.TypeBased()
+                        .MapAssemblyOf<ResourceSaved>("persistence-messages")
+                        .MapAssemblyOf<ScrapeWebSiteCommand>("scraper-messages")));
                 
         }
 
