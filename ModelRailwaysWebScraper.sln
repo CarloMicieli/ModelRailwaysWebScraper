@@ -15,9 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Persistence", "Src\Persiste
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App", "Src\App\App.csproj", "{D0DE9B13-6DF1-4CD8-B559-1502772A7E35}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence.Messages", "Persistence.Messages\Persistence.Messages.csproj", "{18CAA219-1C41-4D06-A2D6-5F166C56D9C3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence.Messages", "Src\Persistence.Messages\Persistence.Messages.csproj", "{18CAA219-1C41-4D06-A2D6-5F166C56D9C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebScraper.Messages", "WebScraper.Messages\WebScraper.Messages.csproj", "{DDF25436-8E39-40D3-8930-780797111C79}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebScraper.Messages", "Src\WebScraper.Messages\WebScraper.Messages.csproj", "{DDF25436-8E39-40D3-8930-780797111C79}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Src\Core\Core.csproj", "{15014FD9-CDB2-4B99-8EC5-48BD20617317}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,6 +103,18 @@ Global
 		{DDF25436-8E39-40D3-8930-780797111C79}.Release|x64.Build.0 = Release|Any CPU
 		{DDF25436-8E39-40D3-8930-780797111C79}.Release|x86.ActiveCfg = Release|Any CPU
 		{DDF25436-8E39-40D3-8930-780797111C79}.Release|x86.Build.0 = Release|Any CPU
+		{15014FD9-CDB2-4B99-8EC5-48BD20617317}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15014FD9-CDB2-4B99-8EC5-48BD20617317}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15014FD9-CDB2-4B99-8EC5-48BD20617317}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{15014FD9-CDB2-4B99-8EC5-48BD20617317}.Debug|x64.Build.0 = Debug|Any CPU
+		{15014FD9-CDB2-4B99-8EC5-48BD20617317}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{15014FD9-CDB2-4B99-8EC5-48BD20617317}.Debug|x86.Build.0 = Debug|Any CPU
+		{15014FD9-CDB2-4B99-8EC5-48BD20617317}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15014FD9-CDB2-4B99-8EC5-48BD20617317}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15014FD9-CDB2-4B99-8EC5-48BD20617317}.Release|x64.ActiveCfg = Release|Any CPU
+		{15014FD9-CDB2-4B99-8EC5-48BD20617317}.Release|x64.Build.0 = Release|Any CPU
+		{15014FD9-CDB2-4B99-8EC5-48BD20617317}.Release|x86.ActiveCfg = Release|Any CPU
+		{15014FD9-CDB2-4B99-8EC5-48BD20617317}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -112,6 +126,7 @@ Global
 		{D0DE9B13-6DF1-4CD8-B559-1502772A7E35} = {FB3B4B3C-0503-47FF-957C-98FF745573B9}
 		{18CAA219-1C41-4D06-A2D6-5F166C56D9C3} = {FB3B4B3C-0503-47FF-957C-98FF745573B9}
 		{DDF25436-8E39-40D3-8930-780797111C79} = {FB3B4B3C-0503-47FF-957C-98FF745573B9}
+		{15014FD9-CDB2-4B99-8EC5-48BD20617317} = {FB3B4B3C-0503-47FF-957C-98FF745573B9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DAE2D7F1-0144-4F30-AB3B-93D0CD63C0FC}

@@ -5,20 +5,28 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using MongoDB;
-using WebScraper;
 using App.Configuration;
 using Rebus.ServiceProvider;
 using Rebus.Config;
 using Rebus.Transport.InMem;
 using Rebus.Routing.TypeBased;
-using Persistence.Messages;
-using WebScraper.Messages;
 using Rebus.Persistence.InMem;
+using Rebus.Retry.Simple;
+using Rebus.Bus;
+using Core;
+using System.Linq;
+using Persistence.Handlers;
+using Persistence.Messages.Events;
+using WebScraper;
+using WebScraper.Handlers;
+using WebScraper.Messages.Commands;
 
 namespace App
 {
     public class Startup
     {
+        private const string QueueName = "model-railways";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -48,27 +56,27 @@ namespace App
             var rabbitMq = new RabbitMqConfig();
             Configuration.GetSection("RabbitMq").Bind(rabbitMq);
 
-            // Register handlers 
-            services.AutoRegisterHandlersFromAssemblyOf<Startup>();
+            services.AutoRegisterHandlersFromAssemblyOf<ScrapingCommandsHandler>();
+            services.AutoRegisterHandlersFromAssemblyOf<DatabaseEventsHandler>();
 
-            // Configure and register Rebus
             services.AddRebus(configure => configure
-                .Options(o => 
+                .Options(o =>
                 {
                     o.SetNumberOfWorkers(4);
                     o.SetMaxParallelism(16);
+                    o.SimpleRetryStrategy(maxDeliveryAttempts: 3);
+                    o.LogPipeline(verbose: true);
                 })
                 .Logging(l => l.Serilog())
-                .Transport(t => 
+                .Transport(t =>
                 {
-                    t.UseInMemoryTransport(new InMemNetwork(), "scraper-messages");
+                    t.UseInMemoryTransport(new InMemNetwork(), QueueName);
                 })
                 .Subscriptions(s => s.StoreInMemory())
-                .Routing(r => 
+                .Routing(r =>
                     r.TypeBased()
-                        .MapAssemblyOf<ResourceSaved>("persistence-messages")
-                        .MapAssemblyOf<ScrapeWebSiteCommand>("scraper-messages")));
-                
+                        .MapAssemblyOf<ResourceSaved>(QueueName)
+                        .MapAssemblyOf<ScrapeWebSiteCommand>(QueueName)));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -78,7 +86,10 @@ namespace App
                 app.UseDeveloperExceptionPage();
             }
 
-            app.ApplicationServices.UseRebus();
+            app.ApplicationServices.UseRebus(bus =>
+            {
+                SubscribeEvents(bus);
+            });
 
             app.UseRouting();
 
@@ -86,6 +97,20 @@ namespace App
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private static void SubscribeEvents(IBus bus)
+        {
+            var markerInterface = typeof(IEvent);
+            var eventTypes = typeof(ResourceSaved).Assembly
+                .GetTypes()
+                .Where(it => markerInterface.IsAssignableFrom(it));
+
+            foreach (var eventType in eventTypes)
+            {
+                // Bad practice
+                bus.Subscribe(eventType).GetAwaiter().GetResult();
+            }
         }
     }
 }

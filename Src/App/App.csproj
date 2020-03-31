@@ -18,10 +18,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Persistence.Messages\Persistence.Messages.csproj" />
-    <ProjectReference Include="..\..\WebScraper.Messages\WebScraper.Messages.csproj" />
+    <ProjectReference Include="..\Persistence.Messages\Persistence.Messages.csproj" />
+    <ProjectReference Include="..\WebScraper.Messages\WebScraper.Messages.csproj" />
     <ProjectReference Include="..\WebScraper\WebScraper.csproj" />
     <ProjectReference Include="..\Persistence\Persistence.csproj" />
+    <ProjectReference Include="..\Core\Core.csproj" />
   </ItemGroup>
 
 </Project>

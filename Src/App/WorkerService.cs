@@ -27,8 +27,8 @@ namespace App
         {
             _logger.LogInformation("Starting...");
 
-            await _bus.Send(new WebScraper.Messages.ScrapeWebSiteCommand 
-            { 
+            await _bus.Send(new WebScraper.Messages.Commands.ScrapeWebSiteCommand
+            {
                 WebsiteUrl = "http://localhost"
             });
         }
